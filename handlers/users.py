@@ -105,6 +105,8 @@ async def cmd_start(message: Message):
         "ℹ️ **Наші менеджери:**\n"
         "• Стасик: @NSLegendsRV\n"
         "• Наталія: @Natali_shop_tt"
+        "<b>УВАГА, У НАШОМУ МАГАЗИНІ ВИКОРИСТОВУЄТЬСЯ ЄВРОПЕЙСКА РОЗМІРНА СІТКА, ДО РОЗМІРУ ДОДАЄТЬСЯ +6</b>"
+        "Наприклад розмір плаття 36, ми до нього додаємо +6, тобто розмір буде 42"
     )
     await message.answer(text=welcome_text, reply_markup=user_keyboard(), parse_mode="Markdown")
 

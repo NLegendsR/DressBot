@@ -33,8 +33,8 @@ def admin_product_keyboard(product_id: int):
     kb = InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text="⬅️", callback_data="prev_prod"),
-                InlineKeyboardButton(text="➡️", callback_data="next_prod")
+                InlineKeyboardButton(text="⬅️Попередня", callback_data="prev_prod"),
+                InlineKeyboardButton(text="➡️Наступне", callback_data="next_prod")
             ],
             [
                 InlineKeyboardButton(text="⚙️ Редагувати товар", callback_data=f"editopt_{product_id}")
