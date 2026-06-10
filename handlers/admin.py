@@ -191,17 +191,16 @@ async def admin_paginate(callback: CallbackQuery, state: FSMContext):
     index = data.get("current_index", 0)
     products = await _get_category_products(state)
 
-    if callback.data == "next_prod":
-        if index + 1 < len(products):
-            await _show_card(callback, state, products, index + 1)
-        else:
-            await callback.answer("Це вже останнє плаття! 🛑", show_alert=True)
-    else:
-        if index - 1 >= 0:
-            await _show_card(callback, state, products, index - 1)
-        else:
-            await callback.answer("Це перше плаття в списку! 🛑", show_alert=True)
+    if not products:
+        await callback.answer()
+        return
 
+    if callback.data == "next_prod":
+        new_index = (index + 1) % len(products)
+    else:
+        new_index = (index - 1) % len(products)
+
+    await _show_card(callback, state, products, new_index)
     await callback.answer()
 
 

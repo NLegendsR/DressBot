@@ -290,18 +290,16 @@ async def user_navigation(callback: CallbackQuery, state: FSMContext):
         products = await _get_products(state)
         total = len(products)
 
+        if not total:
+            await callback.answer()
+            return
+
         if callback.data == "u_next":
-            if index + 1 < total:
-                await _send_card(callback, state, index + 1)
-            else:
-                await callback.answer("Це остання модель у цій категорії! 🌸", show_alert=True)
-                return
+            new_index = (index + 1) % total
         else:
-            if index - 1 >= 0:
-                await _send_card(callback, state, index - 1)
-            else:
-                await callback.answer("Ви на самому початку каталогу!", show_alert=True)
-                return
+            new_index = (index - 1) % total
+
+        await _send_card(callback, state, new_index)
 
     await callback.answer()
 
