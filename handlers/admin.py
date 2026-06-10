@@ -13,7 +13,7 @@ No full product lists in state.
 
 from aiogram import Router, F
 from aiogram.types import Message, InputMediaPhoto, CallbackQuery
-from aiogram.filters import BaseFilter, Command
+from aiogram.filters import BaseFilter, Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
@@ -163,7 +163,7 @@ async def admin_menu_callbacks(callback: CallbackQuery, state: FSMContext):
 
 # ── category selection ────────────────────────────────────────────────────────
 
-@admin_router.callback_query(IsAdmin(), F.data.startswith("cat_"))
+@admin_router.callback_query(IsAdmin(), F.data.startswith("cat_"), ~StateFilter(AddProductSteps.waiting_for_category))
 async def admin_category_callback(callback: CallbackQuery, state: FSMContext):
     cat_map = {
         "cat_eve_dresses":    "eve_dresses",

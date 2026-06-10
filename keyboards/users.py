@@ -83,7 +83,7 @@ def user_product_keyboard(product_id: int):
         inline_keyboard=[
             [
                 InlineKeyboardButton(text="⬅️Попереднє", callback_data="u_prev"),
-                InlineKeyboardButton(text="➡️Наступне", callback_data="u_next")
+                InlineKeyboardButton(text="Наступне➡️", callback_data="u_next")
             ],
             [
                 InlineKeyboardButton(
