@@ -56,6 +56,9 @@ def edit_options_keyboard(product_id: int):
             ],
             [
                 InlineKeyboardButton(text="🖼 Фото", callback_data=f"edit_photo_{product_id}"),
+                InlineKeyboardButton(text="🗂 Категорію", callback_data=f"edit_category_{product_id}")
+            ],
+            [
                 InlineKeyboardButton(text="📏 Додати розміри", callback_data=f"edit_addsize_{product_id}")
             ],
             [

@@ -58,6 +58,7 @@ class EditProductSteps(StatesGroup):
     waiting_for_new_photo     = State()
     waiting_for_add_sizes     = State()
     waiting_for_sizes_to_zero = State()
+    waiting_for_new_category  = State()
 
 
 class SearchProductSteps(StatesGroup):
@@ -163,7 +164,7 @@ async def admin_menu_callbacks(callback: CallbackQuery, state: FSMContext):
 
 # ── category selection ────────────────────────────────────────────────────────
 
-@admin_router.callback_query(IsAdmin(), F.data.startswith("cat_"), ~StateFilter(AddProductSteps.waiting_for_category))
+@admin_router.callback_query(IsAdmin(), F.data.startswith("cat_"), ~StateFilter(AddProductSteps.waiting_for_category), ~StateFilter(EditProductSteps.waiting_for_new_category))
 async def admin_category_callback(callback: CallbackQuery, state: FSMContext):
     cat_map = {
         "cat_eve_dresses":    "eve_dresses",
@@ -255,6 +256,19 @@ async def handle_edit_choice(callback: CallbackQuery, state: FSMContext):
             await state.clear()
         else:
             await callback.answer("Помилка видалення з бази даних.", show_alert=True)
+        await callback.answer()
+        return
+
+    if action == "category":
+        try:
+            await callback.message.edit_caption(
+                caption="🗂 Вибери <b>нову категорію</b> для цього плаття:",
+                reply_markup=catalog_keyboard(),
+                parse_mode="HTML",
+            )
+        except Exception:
+            pass
+        await state.set_state(EditProductSteps.waiting_for_new_category)
         await callback.answer()
         return
 
@@ -350,6 +364,41 @@ async def update_zero_sizes(message: Message, state: FSMContext):
     if upd:
         await update_product(data["editing_product_id"], upd)
     await _after_edit(message, state)
+
+
+@admin_router.callback_query(
+    IsAdmin(),
+    StateFilter(EditProductSteps.waiting_for_new_category),
+    F.data.startswith("cat_"),
+)
+async def update_category(callback: CallbackQuery, state: FSMContext):
+    cat_map = {
+        "cat_eve_dresses":    "eve_dresses",
+        "cat_prom_dresses":   "prom_dresses",
+        "cat_casual_dresses": "casual_dresses",
+    }
+    new_category = cat_map.get(callback.data)
+    if not new_category:
+        await callback.answer("Невідома категорія.", show_alert=True)
+        return
+
+    data    = await state.get_data()
+    prod_id = data.get("editing_product_id")
+    await update_product(prod_id, {"category": new_category})
+
+    product = await get_product_by_id(prod_id)
+    if not product:
+        await callback.answer("Помилка оновлення.", show_alert=True)
+        return
+
+    products = await get_products_by_category(new_category)
+    index    = next((i for i, p in enumerate(products) if p["id"] == prod_id), 0)
+
+    await state.update_data(current_category=new_category, current_index=index)
+    await state.set_state(AdminViewState.browsing)
+
+    await callback.answer("✅ Категорію змінено!")
+    await _show_card(callback, state, products, index)
 
 
 # ── add product (FSM) ─────────────────────────────────────────────────────────
